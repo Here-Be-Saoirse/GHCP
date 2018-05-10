@@ -173,6 +173,7 @@ done
 # show:
 for i in {sh,sho,show};
 do
+if [[ $a = $i ]]; then
 if [[ -z $b ]]; then
 echo "show: incomplete command - try show ?"
 ReadLoop
@@ -195,6 +196,7 @@ done
 if [[ -n $b ]]; then
 echo "$b: not valid in the context of show - try show ?"
 ReadLoop
+fi
 fi
 done
 
