@@ -124,7 +124,7 @@ if [[ -z $b ]]; then
 echo URL needs to be set - for example setup/assistant/alarms
 ReadLoop
 fi
-curl   -H "Content-Type: application/json" -X GET http://$Host:8008/$b 2>/dev/null|python -m json.tool|less&&printf '\n'
+curl   -H "Content-Type: application/json" -X GET http://$Host:8008/$b 2>/dev/null | python -m json.tool | less &&printf '\n'
 ReadLoop
 fi
 done
