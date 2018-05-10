@@ -83,7 +83,7 @@ reload - restart the device (with or without warning)
 
 The following verbs are available:
 
-***NONE***
+show - show system information
 
 Any command or verb can be followed by "?" to see all it's options.
 "
@@ -193,6 +193,12 @@ Device up $uptime_friendly
 ReadLoop
 fi
 done
+if [[ $b = "?" ]]; then
+echo "
+version
+"
+ReadLoop
+fi
 if [[ -n $b ]]; then
 echo "$b: not valid in the context of show - try show ?"
 ReadLoop
