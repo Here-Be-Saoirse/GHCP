@@ -6,19 +6,17 @@ GHCP works on, of course, all Google Home devices and compatible speakers. It *s
 
 ## Dependancies
 
-GHCP requires the following on a linux system to function:
+GHCP requires the following on a linux (or windows with git bash) system to function:
 
 * curl
 * bash (version => 4.0)
 * python (version => 2.6 with the json.tool module)
-* nodejs (with the castnow module)
+* nodejs (with the castnow module) (not needed if you don't need or want to cast)
 
 ## Usage
 
-At the moment, you'll need to consult https://rithvikvibhu.github.io/GHLocalApi/ for API documentation, and type your commands in the form method uri values, like this:
-post setup/reboot {"params": "now"}
+The application contains built-in help, jjust type ?.
 
 ## to do
 
-* Implement a juniper/Vyatta-like shell for this, instead of requiring the user to know raw HTTP REST API commands.
-
+* Add more commands and help for them.
