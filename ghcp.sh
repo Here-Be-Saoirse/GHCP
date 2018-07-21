@@ -30,7 +30,7 @@ function show_time () {
 }
 connect() {
 echo Google Home Command Prompt
-echo version 0.20 beta1
+echo version 0.5 |(beta 24\)
 echo written by Finn Turner \<finn@innervisions.nz\>
 echo "
 This program is free software; you can redistribute it and/or
@@ -51,8 +51,7 @@ read -p "Device IP address: " Host
 #echo attempting to connect with $Host - on port 8008.
 curl http://$Host:8008/ 2>/tmp/curl
 if [ $? != 0 ]; then
-echo Failed to connect to your google home. CURL returned error:
-echo $(cat /tmp/curl)
+echo Failed to connect to your google home. CURL returned error $(cat /tmp/curl|sed -e 's/curl:\ //g'|tr -d '()'|sed -e 's/:\ /\ /g')
 echo please check the google home\'s IP address and network status and try again.
 exit
 fi
@@ -64,7 +63,7 @@ export Version=$(curl "http://$Host:8008/setup/eureka_info?options=detail&params
 #	echo connected to $(curl "http://$Host:8008/setup/eureka_info?options=detail&params=name" 2>/dev/null|sed -e 's/{\"name\":\"/ /g'|sed -e 's/\"}/ /g') at $Host - System version $Version
 }
 ReadLoop() {
-read -p "($HostName) GHCP#" a b c d e f g h i j k l
+read -p "$HostName# " a b c d e f g h i j k l
 ExecLoop
 }
 ExecLoop() {
@@ -72,11 +71,9 @@ if [[ -n $a ]]; then
 for i in {"he","hel","help","\?"}; do
 if [[ $a = $i ]]; then
 echo "
-Google Home Command Prompt (GHCP) Pre-Beta.
-Connected to: $Host ($HostName).
-The following global commands are available (command completion, when unambiguous, is automatic):
+Commands available in this exec:
 'help' or '?' - this screen.
-'exit' or 'quit' - disconnect from the device and close this program.
+'exit' or 'quit' - log out of the exec.
 'hget' and 'hpost' - send raw http get and post commands to your device.
 reload - restart the device (with or without warning)
 
@@ -93,38 +90,33 @@ done
 for i in {exit,exi,q,qui,quit,ex}; do
 
 if [[ $a = $i ]]; then
-read -n 1 -p "Really exit GHCP [y|n]?" resp
-printf "\n"
-if [[ $resp = "y" ]]; then
-echo Disconnecting from $HostName \($Host\).
+echo LogOut
 sleep 1
-echo done
 exit
-fi
 ReadLoop
 fi
 done
 for i in {hp,hpo,hpos,hpost}; do
 if [[ $a = $i ]]; then
 if [[ -z $b ]]; then
-echo URL needs to be set - for example setup/assistant/alarms
+echo % incomplete parameter \'URL\'.
 ReadLoop
 fi
 if [[ -z $c ]]; then
-echo JSON needs to be set - for example {"volume":0}
+echo % incomplete parameter \'data\'.
 ReadLoop
 fi
-curl -d "$c $d $e $f $g $h $i $j $k $l" -H "Content-Type: application/json" -X POST http://$Host:8008/$b 2>/dev/null |python -m json.tool|less&&printf '\n'
+curl -d "$c $d $e $f $g $h $i $j $k $l" -H "Content-Type: application/json" -X POST http://$Host:8008/$b 2>/dev/null |python -m json.tool|more&&printf '\n'
 ReadLoop
 fi
 done
 for i in {hg,hge,hget}; do
 if [[ $a = $i ]]; then
 if [[ -z $b ]]; then
-echo URL needs to be set - for example setup/assistant/alarms
+echo % incomplete parameter \'URL\'.
 ReadLoop
 fi
-curl   -H "Content-Type: application/json" -X GET http://$Host:8008/$b 2>/dev/null | python -m json.tool | less &&printf '\n'
+curl   -H "Content-Type: application/json" -X GET http://$Host:8008/$b 2>/dev/null | python -m json.tool | more &&printf '\n'
 ReadLoop
 fi
 done
@@ -132,7 +124,7 @@ for i in {re,rel,relo,reloa,reload}; do
 if [[ $a = $i ]]; then
 for i in {n,no,now}; do
 if [[ $b = $i ]]; then
-echo notice: rebooting $HostName \($Host\) with NO WARNING!
+echo `date` THE OPERATING SYSTEM ON $HostName \($Host\) IS UNDERGOING A COLD START!
 curl -d "{\"params\":\"now\"}" -H "Content-Type: application/json" -X POST http://$Host:8008/setup/reboot
 echo lost connection to $Host.
 exit
@@ -140,14 +132,14 @@ fi
 done
 if [[ $b = "?" ]]; then
 echo "
-<cr>
-now - skip the warning text
+<cr> - request cold-start confirmation
+now - perform cold-start immediately
 "
 ReadLoop
 fi
 
 if [[ -n $b ]]; then
-echo "unknown parameter $b to command reload - try reload ?"
+echo % invalid parameter
 ReadLoop
 fi
 if [[ -z $b ]]; then
@@ -157,7 +149,7 @@ echo
 read -n 1 -p "$HostName will be rebooted. This will stop any voice interactions, cast sessions, etc. Proceed? {Y|N}" resp
 if [[ $resp = "y" ]]; then
 printf "\n"
-echo restarting.
+echo `date` THE OPERATING SYSTEM ON $HostName \($Host\) IS UNDERGOING A USER-CONFIRMED COLD-START!
 sleep 1
 curl -d "{\"params\":\"now\"}" -H "Content-Type: application/json" -X POST http://$Host:8008/setup/reboot
 sleep 1
@@ -165,7 +157,7 @@ echo lost connection to $Host.
 exit
 fi
 printf "\n"
-echo reboot canceled.
+
 ReadLoop
 fi
 fi
@@ -175,9 +167,33 @@ for i in {sh,sho,show};
 do
 if [[ $a = $i ]]; then
 if [[ -z $b ]]; then
-echo "show: incomplete command - try show ?"
+echo % incomplete command
 ReadLoop
 fi
+for i in {sy,sys,syst,syste,system}; do
+if [[ $b = $i ]]; then
+if [[ -z $c ]]; then
+echo % incomplete command
+ReadLoop
+fi
+if [[ $c = "?" ]]; then
+echo "
+cloudid - show the system's Cloud ID.
+"
+ReadLoop
+fi
+for i in {cl,clo,clou,cloud,cloudi,cloudid}; do
+if [[ $c = $i ]]; then
+export cloudid=$(curl "http://$Host:8008/setup/eureka_info?options=detail&params=" 2>/dev/null|python -m json.tool|grep \"ssdp_udn\"|sed -e 's/\"ssdp_udn\"//g'|sed -e 's/://g'|sed -e 's/\"//g'|sed -e 's/\,//g'|sed -e 's/\.//g'|awk '{print $1}')
+echo $cloudid
+ReadLoop
+fi
+done
+echo % invalid command
+ReadLoop
+fi
+done
+
 for i in {ver,vers,versi,versio,version}; do
 if [[ $b = $i ]]; then
 export cast_version=$(curl "http://$Host:8008/setup/eureka_info?options=detail&params=" 2>/dev/null|python -m json.tool|grep \"cast_build_revision\"|sed -e 's/\"cast_build_revision\"/ /g'|sed -e 's/:/ /g'|sed -e 's/\"/ /g'|sed -e 's/\,/ /g'|sed -e 's/ *//g')
@@ -193,14 +209,22 @@ Device up $uptime_friendly
 ReadLoop
 fi
 done
+for i in {co,con,conn,conne,connec,connect,connecti,connectio,connection}; do
+if [[ $b = $i ]]; then
+echo Connected to $Host - $HostName
+ReadLoop
+fi
+done
 if [[ $b = "?" ]]; then
 echo "
-version
+connection - show hostname and connected device
+system - show system parameters
+version - show the software release on this device
 "
 ReadLoop
 fi
 if [[ -n $b ]]; then
-echo "$b: not valid in the context of show - try show ?"
+echo "% invalid parameter"
 ReadLoop
 fi
 fi
@@ -208,7 +232,7 @@ done
 
 
 
-echo $a: not a recognised method or command
+echo % invalid command
 fi
 ReadLoop
 }
