@@ -30,7 +30,7 @@ function show_time () {
 }
 connect() {
 echo Google Home Command Prompt
-echo version 0.5 |(beta 24\)
+echo version 0.5 \(beta 24\)
 echo written by Finn Turner \<finn@innervisions.nz\>
 echo "
 This program is free software; you can redistribute it and/or
@@ -48,15 +48,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 "
 read -p "Device IP address: " Host
-#echo attempting to connect with $Host - on port 8008.
+echo contacting $Host...
 curl http://$Host:8008/ 2>/tmp/curl
 if [ $? != 0 ]; then
-echo Failed to connect to your google home. CURL returned error $(cat /tmp/curl|sed -e 's/curl:\ //g'|tr -d '()'|sed -e 's/:\ /\ /g')
+echo Failed to connect to your google home. CURL returned error $(cat /tmp/curl|sed -e 's/curl:\ //g'|sed -e 's/,//g'|tr -d '()'|sed -e 's/:\ /\ /g')
 echo please check the google home\'s IP address and network status and try again.
 exit
 fi
 # we assume the connection succeeded.
-#echo negotiating connection with $Host...
+echo Protocol ack \(acknowledge\) received.
+export publickey=$(curl http://$Host:8008/setup/eureka_info?options=detail 2>/dev/null|python -m json.tool|grep key|sed -e 's/\"//g'|sed -e 's/public_key:\ //g'|sed -e 's/,//g')
 export HostName=$(curl "http://$Host:8008/setup/eureka_info?options=detail&params=name" 2>/dev/null|sed -e 's/{\"name\":\"/ /g'|sed -e 's/\"}/ /g')
 export Version=$(curl "http://$Host:8008/setup/eureka_info?options=detail&params=build_info" 2>/dev/null|python -m json.tool|grep system_build|awk '{print $2}'|sed -e 's/\"/ /g')
 
@@ -99,11 +100,11 @@ done
 for i in {hp,hpo,hpos,hpost}; do
 if [[ $a = $i ]]; then
 if [[ -z $b ]]; then
-echo % incomplete parameter \'URL\'.
+echo % Error in word 2: \'URL\' parameter required.
 ReadLoop
 fi
 if [[ -z $c ]]; then
-echo % incomplete parameter \'data\'.
+echo % Error in word 3: \'DATA\' parameter required.
 ReadLoop
 fi
 curl -d "$c $d $e $f $g $h $i $j $k $l" -H "Content-Type: application/json" -X POST http://$Host:8008/$b 2>/dev/null |python -m json.tool|more&&printf '\n'
@@ -113,7 +114,7 @@ done
 for i in {hg,hge,hget}; do
 if [[ $a = $i ]]; then
 if [[ -z $b ]]; then
-echo % incomplete parameter \'URL\'.
+echo % Error in word 2: \'URL\' parameter required.
 ReadLoop
 fi
 curl   -H "Content-Type: application/json" -X GET http://$Host:8008/$b 2>/dev/null | python -m json.tool | more &&printf '\n'
@@ -139,7 +140,7 @@ ReadLoop
 fi
 
 if [[ -n $b ]]; then
-echo % invalid parameter
+echo % Error in word 2: $b is not valid in the context of $a.
 ReadLoop
 fi
 if [[ -z $b ]]; then
@@ -215,11 +216,26 @@ echo Connected to $Host - $HostName
 ReadLoop
 fi
 done
+for i in {pu,pub,publ,publi,public,publick,publicke,publickey}; do
+if [[ $b = $i ]]; then
+echo System Public Key: $publickey
+ReadLoop
+fi
+done
+for i in {pl,pla,plat,platf,platfo,platfor,platform}; do
+if [[ $i = $b ]]; then
+echo $(curl http://$Host:8008/setup/eureka_info?options=detail 2>/dev/null|python -m json.tool|grep manufa|sed -e 's/\"//g'|sed -e 's/manufacturer:\ //g'|sed -e 's/,//g') $(curl http://$Host:8008/setup/eureka_info?options=detail 2>/dev/null|python -m json.tool|grep model|sed -e 's/\"//g'|sed -e 's/model_name:\ //g'|sed -e 's/,//g') platform:
+echo Mac address: $(curl http://$Host:8008/setup/eureka_info?options=detail 2>/dev/null|python -m json.tool|grep mac_addr|sed -e 's/\"//g'|sed -e 's/mac_address:\ //g'|sed -e 's/,//g') 
+ReadLoop
+fi
+done
 if [[ $b = "?" ]]; then
 echo "
 connection - show hostname and connected device
-system - show system parameters
-version - show the software release on this device
+platform - show device name, serial number, etc
+publickey - show the identity public key
+software - show system software parameters
+version - show the OS version and cast firmware revision on this device
 "
 ReadLoop
 fi
