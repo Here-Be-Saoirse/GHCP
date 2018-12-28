@@ -30,7 +30,8 @@ function show_time () {
 }
 connect() {
 echo Google Home Command Prompt
-echo version 0.5 \(beta 24\)
+echo version 0.6\(1\) on `uname`
+
 echo written by Finn Turner \<finn@innervisions.nz\>
 echo "
 This program is free software; you can redistribute it and/or

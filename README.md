@@ -6,11 +6,12 @@ GHCP works on, of course, all Google Home devices and compatible speakers. It *s
 
 ## Dependancies
 
-GHCP requires the following on a linux (or windows with git bash) system to function:
+GHCP requires the following on a linux/bsd (or windows with git bash) 
+system to function:
 
 * curl
 * bash (version => 4.0)
-* python (version => 2.6 with the json.tool module)
+* python in your path (version => 2.6 with the json.tool module)
 * nodejs (with the castnow module) (not needed if you don't need or want to cast)
 
 ## Usage
