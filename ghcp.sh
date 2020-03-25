@@ -1,7 +1,7 @@
 #!/bin/bash
 # GHCP - the Google Home Command Prompt
 # interact with your google home over the network
-# Copyright (C) 2018 - Finn Turner
+# Copyright (C) 2018 - Saoirse Ó Catháin
 # run a first function to ask for input
 function show_time () {
     num=$1
