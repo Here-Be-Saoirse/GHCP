@@ -32,7 +32,8 @@ connect() {
 echo Google Home Command Prompt
 echo version 0.6\(1\) on `uname`
 
-echo written by Finn Turner \<finn@innervisions.nz\>
+echo written by Saoirse Ó Catháin \<saoirse@axiom-networks.org\>
+echo "WARNING: this program *will probably not work* due to Google API changes."
 echo "
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
