@@ -255,5 +255,7 @@ fi
 ReadLoop
 }
 
-connect
-ReadLoop
+echo error: this program has been disabled as it is no longer functional
+exit 0
+#connect
+#ReadLoop

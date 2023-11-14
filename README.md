@@ -1,8 +1,13 @@
 # GHCP
 Google Home Command Prompt - a basic shell for the Google Home and other compatible hardware
+# ***W A R N I N G***
+# *** THIS APPLICATION IS NO LONGER COMPATIBLE WITH ANY MODERN GOOGLE CAST DEVICES ***
+# *** GOOGLE HAS CHANGED THEIR API FOR REMOTE CONTROL, NOW REQUIRING AUTHENTICATION. ***
+# *** ASSUME THIS REPOSITORY PURELY DEMONSTRATIVE OF OUR PREVIOUS STYLE OF CODE, NOT A VIABLE APPLICATION NOW ***
+
 ## Compatible devices
 
-GHCP works on, of course, all Google Home devices and compatible speakers. It *should* also work with chromecasts and any other device that implements this same Google Home app / Google Cast app API
+none, after Google changed their authentication method
 
 ## Dependancies
 
